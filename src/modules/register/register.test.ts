@@ -1,3 +1,4 @@
+import { Connection } from 'typeorm';
 import {
   duplicateEmail,
   emailNotLongEnough,
@@ -20,9 +21,14 @@ mutation {
   }
 }
 `;
+let conn: Connection;
 
 beforeAll(async () => {
-  await createTypeormConnection();
+  conn = await createTypeormConnection();
+});
+
+afterAll(async () => {
+   await conn.close();
 });
 
 test("Register user test", async () => {

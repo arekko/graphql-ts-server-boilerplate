@@ -1,3 +1,4 @@
+import { Connection } from 'typeorm';
 import { request } from "graphql-request";
 import { invalidLogin, confirmEmailError } from "./errorMessages";
 import { User } from "../../entity/User";
@@ -40,9 +41,17 @@ const LoginExpectError = async (e: string, p: string, errMessage: string) => {
   });
 };
 
+
+let conn: Connection;
+
 beforeAll(async () => {
-  await createTypeormConnection();
+  conn = await createTypeormConnection();
 });
+
+afterAll(async () => {
+  await conn.close();
+});
+
 
 describe("login", () => {
   test("email not found send back error", async () => {
