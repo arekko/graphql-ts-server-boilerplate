@@ -1,3 +1,4 @@
+import { sendEmail } from './../../utils/sendEmail';
 import {
   duplicateEmail,
   emailNotLongEnough,
@@ -56,7 +57,7 @@ export const resolvers: ResolverMap = {
         password: hashedPassword
       });
       await user.save();
-      await createConfirmEmailLink(url, user.id, redis);
+      sendEmail(email, await createConfirmEmailLink(url, user.id, redis));
       return null;
     }
   }
