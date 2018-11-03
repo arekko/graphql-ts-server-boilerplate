@@ -1,10 +1,14 @@
-import { duplicateEmail, emailNotLongEnough, passwordNotLongEnough } from './errorMessages';
+import {
+  duplicateEmail,
+  emailNotLongEnough,
+  passwordNotLongEnough
+} from "./errorMessages";
 import { User } from "./../../entity/User";
 import { ResolverMap } from "./../../types/graphql-utils";
 import * as yup from "yup";
 import * as bcrypt from "bcryptjs";
 import { formatYupError } from "../../utils/formatYupError";
-import { createConfirmEmailLink } from '../../utils/createConfirmEmailLink';
+import { createConfirmEmailLink } from "../../utils/createConfirmEmailLink";
 
 const schema = yup.object().shape({
   email: yup
@@ -30,10 +34,10 @@ export const resolvers: ResolverMap = {
     ) => {
       try {
         await schema.validate(args, { abortEarly: false });
-      } catch(err) {
+      } catch (err) {
         return formatYupError(err);
       }
-      const {email, password} = args;
+      const { email, password } = args;
       const userAlreadyExists = await User.findOne({
         where: { email },
         select: ["id"]
@@ -52,7 +56,7 @@ export const resolvers: ResolverMap = {
         password: hashedPassword
       });
       await user.save();
-      const link = await createConfirmEmailLink(url, user.id, redis);
+      await createConfirmEmailLink(url, user.id, redis);
       return null;
     }
   }
