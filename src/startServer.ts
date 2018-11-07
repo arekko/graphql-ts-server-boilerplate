@@ -1,3 +1,6 @@
+import "reflect-metadata";
+import "dotenv/config"
+
 import * as session from 'express-session';
 import * as connectRedis from  'connect-redis'
 

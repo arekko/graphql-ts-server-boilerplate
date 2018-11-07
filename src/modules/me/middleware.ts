@@ -1,4 +1,5 @@
-import { Resolver } from './../../types/graphql-utils';
+import { logger } from "./../../utils/logger";
+import { Resolver } from "./../../types/graphql-utils";
 
 export default async (
   resolver: Resolver,
@@ -7,11 +8,5 @@ export default async (
   context: any,
   info: any
 ) => {
-  // middleware
-
-  const result = await resolver(parent, args, context, info);
-  // afterware
-
-
-  return result;
+  return resolver(parent, args, context, info);
 };

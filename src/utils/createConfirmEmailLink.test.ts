@@ -29,10 +29,8 @@ test("Make sure it confirms user and clears key in redis", async () => {
     redis
   );
 
-  console.log(url);
   const respose = await fetch(url);
   const text = await respose.text();
-  console.log(text);
   expect(text).toEqual("ok");
   const user = await User.findOne({ where: { id: userId } });
   expect((user as User).confirmed).toBeTruthy();
