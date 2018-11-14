@@ -1,3 +1,4 @@
+import { redisSessionPrefix } from './constants';
 import "reflect-metadata";
 import "dotenv/config"
 
@@ -20,14 +21,18 @@ export const startServer = async () => {
     context: ({ request }) => ({
       redis,
       url: request.protocol + "://" + request.get("host"),
-      session: request.session
+      session: request.session,
+      req: request
     })
   });
 
 
 server.express.use(
   session({
-    store: new RedisStore({}),
+    store: new RedisStore({
+      client: redis as any,
+      prefix: redisSessionPrefix
+    }),
     name: "qid",
     secret: SESSION_SECRET,
     resave: false,

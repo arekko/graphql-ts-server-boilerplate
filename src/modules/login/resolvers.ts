@@ -1,3 +1,4 @@
+import { userSessionIdPrefix } from './../../constants';
 import { invalidLogin, confirmEmailError } from "./errorMessages";
 import { User } from "./../../entity/User";
 import { ResolverMap } from "./../../types/graphql-utils";
@@ -15,7 +16,7 @@ export const resolvers: ResolverMap = {
     bye2: () => "bye"
   },
   Mutation: {
-    login: async (_, { email, password }: GQL.ILoginOnMutationArguments, { session }) => {
+    login: async (_, { email, password }: GQL.ILoginOnMutationArguments, { session, redis, req }) => {
       const user = await User.findOne({ where: { email } });
 
       console.log(session)
@@ -39,6 +40,10 @@ export const resolvers: ResolverMap = {
 
       // login success
         session.userId = user.id;
+
+        if (req.sessionID) {
+          redis.lpush(`${userSessionIdPrefix}${user.id}`, req.sessionID);
+        }
 
         console.log(session)
 
