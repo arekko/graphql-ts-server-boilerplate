@@ -2,36 +2,12 @@ import { TestClient } from './../../utils/TestClient';
 import { User } from "./../../entity/User";
 import { createTypeormConnection } from "./../../utils/createTypeormConnection";
 import { Connection } from "typeorm";
-import axios from "axios";
 
 let conn: Connection;
 
 let userId: string;
 const email = "arekko@mail.com";
 const password = "fasdfkasdfjh";
-
-const loginMutation = (e: string, p: string) => `
-mutation {
-  login(email: "${e}", password: "${p}") {
-    path
-    message
-  }
-}
-`;
-
-const meQuery = `
-{
-  me {
-      id
-      email
-  }
-}
-`;
-const logoutMutation = `
-mutation {
-  logout
-}
-`;
 
 beforeAll(async () => {
   conn = await createTypeormConnection();
@@ -49,10 +25,6 @@ afterAll(async () => {
 
 describe("logout test", () => {
   test("test logging out the user", async () => {
-
-  
-  
-    
 
     const client = new TestClient(process.env.TEST_HOST as string);
 
@@ -73,7 +45,5 @@ describe("logout test", () => {
 
     expect(response2.data.me).toBeNull()
 
-
     })
-
 });

@@ -2,6 +2,7 @@ import { User } from "./../../entity/User";
 import { createTypeormConnection } from "./../../utils/createTypeormConnection";
 import { Connection } from "typeorm";
 import axios from "axios";
+import { TestClient } from "../../utils/TestClient";
 
 let conn: Connection;
 
@@ -9,23 +10,7 @@ let userId: string;
 const email = "arekko@mail.com";
 const password = "fasdfkasdfjh";
 
-const loginMutation = (e: string, p: string) => `
-mutation {
-  login(email: "${e}", password: "${p}") {
-    path
-    message
-  }
-}
-`;
 
-const meQuery = `
-{
-  me {
-      id
-      email
-  }
-}
-`;
 
 beforeAll(async () => {
   conn = await createTypeormConnection();
@@ -42,41 +27,56 @@ afterAll(async () => {
 });
 
 describe("me", () => {
-  test("return null if no cookie", async () => {
-     const response2 = await axios.post(
-      process.env.TEST_HOST as string,
-      {
-        query: meQuery
-      },
-    );
+  const client  = new TestClient(process.env.TEST_HOST as string);
 
-    expect(response2.data.data.me).toBeNull()
+
+  test("return null if no cookie", async () => {
+
+    const response2 = await client.me()
+
+
+    //  const response2 = await axios.post(
+    //   process.env.TEST_HOST as string,
+    //   {
+    //     query: meQuery
+    //   },
+    // );
+
+    expect(response2.data.me).toBeNull()
   })
     
   
 
   test("get current user", async () => {
-    await axios.post(
-      process.env.TEST_HOST as string,
-      { 
-        query: loginMutation(email, password)
-      },
-      {
-        withCredentials: true
-      }
-    );
 
-    const response = await axios.post(
-      process.env.TEST_HOST as string,
-      {
-        query: meQuery
-      },
-      {
-        withCredentials: true
-      }
-    );
 
-    expect(response.data.data).toEqual({
+    // await axios.post(
+    //   process.env.TEST_HOST as string,
+    //   { 
+    //     query: loginMutation(email, password)
+    //   },
+    //   {
+    //     withCredentials: true
+    //   }
+    // );
+
+    await client.login(email, password);
+
+    const response = await client.me()
+
+
+    // const response = await axios.post(
+    //   process.env.TEST_HOST as string,
+    //   {
+    //     query: meQuery
+    //   },
+    //   {
+    //     withCredentials: true
+    //   }
+    // );
+
+
+    expect(response.data).toEqual({
       me: {
         id: userId.toString(),
         email
