@@ -8,6 +8,7 @@ export class TestClient {
     withCredentials: boolean;
     json: boolean;
   };
+
   constructor(url: string) {
     this.url = url;
     this.options = {
@@ -55,6 +56,21 @@ export class TestClient {
         query: `
         mutation {
           logout
+        }
+      `}
+    });
+  }
+
+  async register(email: string, password: string) {
+    return rp.post(this.url, {
+      ...this.options,
+      body: {
+        query: `
+        mutation {
+          register(email: "${email}", password: "${password}") {
+            path
+            message
+          }
         }
       `}
     });
