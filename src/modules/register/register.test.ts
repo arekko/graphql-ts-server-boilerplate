@@ -39,7 +39,6 @@ test("Register user test", async () => {
   // test for duplicate email
 
   const response2 = await client.register(email, password)
-  // const response2: any = await request(process.env.TEST_HOST as string, mutation(email, password));
   expect(response2.data.register).toHaveLength(1);
   expect(response2.data.register[0]).toEqual({
     path: "email",
@@ -63,7 +62,6 @@ test("Register user test", async () => {
   });
 
   // catch bad password
-  // const response4: any = await request(process.env.TEST_HOST as string, mutation(email, "12"));
   const response4 = await client.register(email, '12')
   expect(response4.data).toEqual({
     register: [
@@ -75,7 +73,6 @@ test("Register user test", async () => {
   });
 
   // catch bad password and bad email
-  // const response5: any = await request(process.env.TEST_HOST as string, mutation("as", "12"));
 
   const response5 = await client.register('as', '34')
   expect(response5.data).toEqual({
