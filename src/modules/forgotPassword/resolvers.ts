@@ -7,7 +7,7 @@ import { ResolverMap } from "./../../types/graphql-utils";
 import { forgotPasswordPrefix } from '../../constants';
 import { registerPasswordValidation } from '../../yupSchemas';
 import * as yup from 'yup';
-import * as bcrypt from 'bcryptjs'
+import * as bcrypt from 'bcryptjs';
 
 const schema = yup.object().shape({
  newPassword: registerPasswordValidation
@@ -37,7 +37,7 @@ export const resolvers: ResolverMap = {
       // @send email with url
       return true;
     },
-    forgotPasswordChange: async (
+    forgotPasswordChange: async ( 
       _,
       { newPassword, key }: GQL.IForgotPasswordChangeOnMutationArguments,
       { redis }
