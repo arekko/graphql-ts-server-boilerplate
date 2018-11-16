@@ -1,5 +1,5 @@
 import { userSessionIdPrefix } from './../../constants';
-import { invalidLogin, confirmEmailError } from "./errorMessages";
+import { invalidLogin, confirmEmailError, forgotPosswordLockedError } from "./errorMessages";
 import { User } from "./../../entity/User";
 import { ResolverMap } from "./../../types/graphql-utils";
 import * as bcrypt from "bcryptjs";
@@ -30,6 +30,14 @@ export const resolvers: ResolverMap = {
           path: "email",
           message: confirmEmailError
         }]
+      }
+
+      if (user.forgotPasswordLocked) {
+        return [{
+          path: "email",
+          message: forgotPosswordLockedError
+        }]
+ 
       }
 
       const valid = await bcrypt.compare(password, user.password);

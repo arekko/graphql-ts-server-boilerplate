@@ -1,2 +1,2 @@
-export const invalidLogin = "Invalid login";
-export const confirmEmailError = "Please confirm your email"
+export const expiredKeyError = "key has expired";
+export const userNotFoundError = "Could not find user with this email";

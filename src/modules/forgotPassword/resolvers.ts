@@ -1,51 +1,77 @@
-import { userSessionIdPrefix } from './../../constants';
-import { invalidLogin, confirmEmailError } from "./errorMessages";
-import { User } from "./../../entity/User";
+import { formatYupError } from './../../utils/formatYupError';
+import { userNotFoundError, expiredKeyError } from './errorMessages';
+import { User } from './../../entity/User';
+import { createForgotPasswordLink } from './../../utils/createForgotPasswordLink';
+import { forgotPasswordLockAccount } from './../../utils/forgotPasswordLockAccount';
 import { ResolverMap } from "./../../types/graphql-utils";
-import * as bcrypt from "bcryptjs";
+import { forgotPasswordPrefix } from '../../constants';
+import { registerPasswordValidation } from '../../yupSchemas';
+import * as yup from 'yup';
+import * as bcrypt from 'bcryptjs'
 
-const errorResponse = [
-  {
-    path: "email",
-    message: invalidLogin
-  }
-];
+const schema = yup.object().shape({
+ newPassword: registerPasswordValidation
+});
 
 export const resolvers: ResolverMap = {
   Query: {
-    bye2: () => "bye"
+    dummy2: () => "dummy2"
   },
   Mutation: {
-    login: async (_, { email, password }: GQL.ILoginOnMutationArguments, { session, redis, req }) => {
-      const user = await User.findOne({ where: { email } });
+    sendForgotPasswordEmail: async (
+      _,
+      { email }: GQL.ISendForgotPasswordEmailOnMutationArguments,
+      { redis }
+    ) => {
 
-      console.log(session)
-
-      if (!user) {
-        return errorResponse;
+      const user = await User.findOne({ where: {email} });
+      if(!user) {
+        return {
+          path: 'email',
+          message: userNotFoundError
+        } 
       }
+      await forgotPasswordLockAccount(user.id, redis);
+      // @todo add frontend url
+      await createForgotPasswordLink("", user.id, redis);
+      // @send email with url
+      return true;
+    },
+    forgotPasswordChange: async (
+      _,
+      { newPassword, key }: GQL.IForgotPasswordChangeOnMutationArguments,
+      { redis }
+    ) => {
 
-      if (!user.confirmed) {
+      const redisKey = `${forgotPasswordPrefix}${key}`;
+      const userId = await redis.get(redisKey)
+
+      console.log(`Rediskey: ${redisKey}`);
+      console.log(`UserId ${userId}`);
+
+      if (!userId) {
         return [{
-          path: "email",
-          message: confirmEmailError
+          path: 'key',
+          message: expiredKeyError
         }]
       }
 
-      const valid = await bcrypt.compare(password, user.password);
-
-      if (!valid) {
-        return errorResponse;
+      try {
+        await schema.validate({ newPassword }, { abortEarly: false });
+      } catch (err) {
+        return formatYupError(err);
       }
 
-      // login success
-        session.userId = user.id;
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-        if (req.sessionID) {
-          redis.lpush(`${userSessionIdPrefix}${user.id}`, req.sessionID);
-        }
+      const updatePromise = await User.update({ id: userId}, {
+        forgotPasswordLocked: false,
+        password: hashedPassword
+      })
 
-        console.log(session)
+      const deleteKeyPromise = await redis.del(redisKey)
+
+      await Promise.all([updatePromise, deleteKeyPromise]);
 
       return null;
     }

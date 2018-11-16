@@ -1,6 +1,5 @@
 import { TestClient } from './../../utils/TestClient';
 import { Connection } from 'typeorm';
-import { request } from "graphql-request";
 import { invalidLogin, confirmEmailError } from "./errorMessages";
 import { User } from "../../entity/User";
 import { createTypeormConnection } from "../../utils/createTypeormConnection";

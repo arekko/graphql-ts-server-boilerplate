@@ -1,13 +1,10 @@
 // import { sendEmail } from './../../utils/sendEmail';
-import {
-  duplicateEmail,
-  emailNotLongEnough,
-  passwordNotLongEnough
-} from "./errorMessages";
+import { duplicateEmail, emailNotLongEnough } from "./errorMessages";
 import { User } from "./../../entity/User";
 import { ResolverMap } from "./../../types/graphql-utils";
 import * as yup from "yup";
 import { formatYupError } from "../../utils/formatYupError";
+import { registerPasswordValidation } from "../../yupSchemas";
 // import { createConfirmEmailLink } from "../../utils/createConfirmEmailLink";
 
 const schema = yup.object().shape({
@@ -16,10 +13,7 @@ const schema = yup.object().shape({
     .min(3, emailNotLongEnough)
     .max(255)
     .email(),
-  password: yup
-    .string()
-    .min(3, passwordNotLongEnough)
-    .max(255)
+  password: registerPasswordValidation
 });
 
 export const resolvers: ResolverMap = {
@@ -29,7 +23,7 @@ export const resolvers: ResolverMap = {
   Mutation: {
     register: async (
       _,
-      args: GQL.IRegisterOnMutationArguments,
+      args: GQL.IRegisterOnMutationArguments
       // { redis, url }
     ) => {
       try {
