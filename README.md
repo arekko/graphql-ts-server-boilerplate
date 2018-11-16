@@ -1,6 +1,4 @@
-# Awesome Project Build with TypeORM
-        
-Steps to run this project:
+#graphql-ts-server
 
 1. Run `npm i` command
 2. Setup database settings inside `ormconfig.json` file
