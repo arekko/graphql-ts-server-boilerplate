@@ -1,4 +1,4 @@
-#graphql-ts-server
+graphql-ts-server
 
 1. Run `npm i` command
 2. Setup database settings inside `ormconfig.json` file
