@@ -109,6 +109,7 @@ export const startServer = async () => {
             email
           }).save();
         } else if (!user.googleId) {
+          // metge account
           user.googleId = id;
           user.save();
         } else {
